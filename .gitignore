@@ -1,0 +1,18 @@
+# build artifacts
+build/
+pkg/
+src/
+*.pkg.tar.zst
+*.pkg.tar.xz
+*.pkg.tar.zst.sig
+
+# makepkg
+makepkg.lock
+
+# extracted upstream sources
+libfprint-v*/
+
+# local debug output (may contain fingerprint images — never commit)
+*.pgm
+*.png
+dumps/

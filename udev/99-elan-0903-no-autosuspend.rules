@@ -1,0 +1,3 @@
+# ELAN 04f3:0903 fingerprint sensor: keep it out of USB autosuspend.
+# Without this the reader can be suspended mid-enroll and captures fail.
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="04f3", ATTR{idProduct}=="0903", TEST=="power/control", ATTR{power/control}="on"

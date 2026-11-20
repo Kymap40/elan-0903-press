@@ -1,0 +1,35 @@
+#!/bin/bash
+# Warns when a stock libfprint has replaced the 04f3:0903 press-mode build.
+# Meant to run as a pacman PostTransaction hook (see 90-fprint-patch-check.hook).
+
+LIB=${LIBFPRINT_LIB:-/usr/lib/libfprint-2.so.2.0.0}
+MARKER="sigfm best score"
+LOG=/var/log/libfprint-elan-0903-patch-warn.log
+REBUILD="rebuild libfprint-elan-0903-patch from the cloned repo (makepkg -f && sudo pacman -U libfprint-elan-0903-patch-*.pkg.tar.zst)"
+
+warn() {
+  echo -e "\n\e[33m==> WARNING: fingerprint reader (ELAN 04f3:0903): $1\e[0m"
+  echo -e "\e[33m    $REBUILD\e[0m"
+  echo "$(date -Is) $1" >> "$LOG" 2>/dev/null
+
+  # best-effort desktop notification for every logged-in user
+  for u in $(loginctl list-users --no-legend 2>/dev/null | awk '{print $1}'); do
+    uid=$(id -u "$u" 2>/dev/null) || continue
+    [ -S "/run/user/$uid/bus" ] || continue
+    runuser -u "$u" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
+      DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+      notify-send -u critical "Fingerprint reader: press-mode patch is gone" \
+        "$1 — $REBUILD" >/dev/null 2>&1
+  done
+}
+
+[ -e "$LIB" ] || { warn "libfprint library is missing"; exit 0; }
+
+if strings "$LIB" 2>/dev/null | grep -q "$MARKER"; then
+  # Freshly (re)installed library: reload the daemon so it maps the new .so.
+  systemctl is-active --quiet fprintd && systemctl restart fprintd
+  exit 0
+fi
+
+warn "press/SIGFM patch is missing (libfprint is stock again)"
+exit 0

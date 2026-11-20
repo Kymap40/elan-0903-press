@@ -1,0 +1,13 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Type = Package
+Target = libfprint
+Target = libfprint-*
+Target = fprintd
+
+[Action]
+Description = Checking for the ELAN 04f3:0903 press/SIGFM patch...
+When = PostTransaction
+Exec = /usr/local/bin/fprint-patch-check

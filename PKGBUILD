@@ -1,4 +1,4 @@
-# Maintainer: (add your name/handle)
+# Maintainer: Kymap40 <https://github.com/Kymap40>
 # Patched libfprint for the ELAN 04f3:0903 96x96 press-and-hold fingerprint
 # sensor (ASUS VivoBook / Zenbook family). Adds press-mode capture and SIGFM
 # matching on top of upstream libfprint v1.94.100, adapted from the AUR package
